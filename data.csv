@@ -1,0 +1,15 @@
+﻿id,toy,wheels,main colour,size,fluffy
+bike_001,Bike,true,green,big,false
+car_001,Toy Car,true,green,small,false
+lego_001,Lego,false,green,small,false
+trampoline_001,Trampoline,false,white,big,false
+doll_001,Doll,false,pink,medium,true
+teddy_001,Teddy,false,brown,medium,true
+xylophone_001,Xylophone,false,multi,medium,false
+scooter_001,Scooter,true,pink,big,false
+slide_001,Slide,false,green,big,false
+swing_001,Swing,false,red,big,false
+piano_001,Piano,false,green,medium,false
+train_001,Train,true,multi,small,false
+tractor_001,Tractor,true,green,big,false
+play_doh_001,Play-Doh,false,blue,small,false
