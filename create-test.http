@@ -1,0 +1,22 @@
+POST http://127.0.0.1:5000/make-tree?id=12345 HTTP/1.1
+content-type: application/json
+
+{
+  "category": ["outside", "inside"],
+  "data": {
+    "bike_001": 1,
+    "car_001": 0,
+    "lego_001": 0,
+    "trampoline_001": 1,
+    "doll_001": 0,
+    "teddy_001": 0,
+    "xylophone_001": 0,
+    "scooter_001": 1,
+    "slide_001": 1,
+    "swing_001": 1,
+    "piano_001": 0,
+    "train_001": 0,
+    "tractor_001": 1,
+    "play_doh_001": 0
+  }
+}

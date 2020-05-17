@@ -50,14 +50,27 @@ def train(X_train, y_train):
     return clf
 
 
-def predict(tree, X_test):
+def predict(tree, toy_id, true_category, target):
+    path = './data.csv'
+    df = importData(path)
+
+    # make dummy variables for colours
+    dummies = pd.get_dummies(df['main colour'])
+    df = df.join(dummies)
+    df = df.drop('main colour', axis=1)
+    # change size into 5, 10, 15 (small, medium, big)
+    df['size'] = df['size'].map({'small': 5, 'medium': 10, 'big': 15})
+
+    X_test = df.loc[df['id'] == toy_id]
+    X_test = X_test.drop('id', axis=1)
+    print(X_test)
     y_pred = tree.predict(X_test)
+
     return y_pred
 
 
 def accuracy(y_pred, y_test):
     print("Confusion Matrix: \n", confusion_matrix(y_test, y_pred))
-
     return "Accuracy : %d" % (accuracy_score(y_test, y_pred)*100)
 
 
@@ -72,8 +85,6 @@ def main(categories, data):
     df = preprocess(df, target, data)
     X_train, X_test, y_train, y_test = split(df)
     tree = train(X_train, y_train)
-    y_pred = predict(tree, X_test)
-    acc = accuracy(y_pred, y_test)
     return tree
 
 
