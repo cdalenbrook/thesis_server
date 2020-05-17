@@ -1,3 +1,4 @@
+import click
 from flask import Flask, request
 import decisiontree
 from utils import store_tree, get_tree, get_target
