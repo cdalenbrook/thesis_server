@@ -5,11 +5,11 @@ from utils import store_tree, get_tree, get_target
 from flask_cors import CORS
 
 app = Flask(__name__)
-
 CORS(app)
 
 
 @app.route('/make-tree', methods=['POST'])
+@cross_origin()
 def handle_data():
     try:
         result = decisiontree.main(
@@ -24,6 +24,7 @@ def handle_data():
 
 
 @app.route('/predict-category', methods=['POST'])
+@cross_origin()
 def predict():
     tree_id = request.args.get('id', '')
     tree = get_tree(tree_id)
