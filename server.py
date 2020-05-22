@@ -2,9 +2,15 @@ import click
 from flask import Flask, request
 import decisiontree
 from utils import store_tree, get_tree, get_target
+from flask_cors import CORS, cross_origin
+
 app = Flask(__name__)
 
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
+
+@cross_origin()
 @app.route('/make-tree', methods=['POST'])
 def handle_data():
     try:
@@ -19,6 +25,7 @@ def handle_data():
         return 'failed'
 
 
+@cross_origin()
 @app.route('/predict-category', methods=['POST'])
 def predict():
     tree_id = request.args.get('id', '')
