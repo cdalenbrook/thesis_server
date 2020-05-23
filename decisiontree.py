@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from sklearn import preprocessing
+from utils import get_data_path
 
 
 def importData(path):
@@ -50,8 +51,9 @@ def train(X_train, y_train):
     return clf
 
 
-def predict(tree, toy_id, true_category, target):
-    path = './data.csv'
+def predict(tree, toy_id, true_category, target, dev: bool):
+    path = get_data_path(dev)
+    print(path)
     df = importData(path)
 
     # make dummy variables for colours
@@ -77,7 +79,7 @@ def accuracy(y_pred, y_test):
 def main(categories, data, dev: bool):
     target = categories[0]
     # import the data without classification
-    path = './data.csv' if not dev else './data-test.csv'
+    path = get_data_path(dev)
     df = importData(path)
     if(target in df.columns):
         target = "target"

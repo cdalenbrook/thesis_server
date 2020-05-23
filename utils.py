@@ -34,3 +34,7 @@ def get_usertruth(id: str):
     if(id in user_truths):
         return user_truths[id]
     return None
+
+
+def get_data_path(dev: bool) -> str:
+    return './data.csv' if not dev else './data-test.csv'

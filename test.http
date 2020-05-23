@@ -1,8 +1,8 @@
-POST https://yuki-server-thesis.herokuapp.com/predict-category?id=12345 HTTP/1.1
-# POST http://127.0.0.1:5000/predict-category?id=12345 HTTP/1.1
+#POST https://yuki-server-thesis.herokuapp.com/predict-category?id=12345 HTTP/1.1
+POST http://127.0.0.1:5000/predict-category?id=12345 HTTP/1.1
 content-type: application/json
 
 {
   "toy_id": "train_001",
-  "user_truth": 0
+  "dev": true
 }

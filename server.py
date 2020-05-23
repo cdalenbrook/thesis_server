@@ -30,13 +30,15 @@ def handle_data():
 def predict():
     try:
         tree_id = request.args.get("id", "default")
+        toy_id = request.json["toy_id"]
+        dev = request.json["dev"]
         tree = utilities.get_tree(tree_id)
         target = utilities.get_target(tree_id)
         user_truth = utilities.get_usertruth(tree_id)
         if(tree is None or target is None or user_truth is None):
             return "Your tree doesn\"t exist yet!", 404
-        y_pred = decisiontree.predict(
-            tree, request.json["toy_id"], user_truth, target)
+        print("I GET TO HERE!")
+        y_pred = decisiontree.predict(tree, toy_id, user_truth, target, dev)
         return {"prediction": y_pred.tolist()}
     except Exception as err:
         print(err)
