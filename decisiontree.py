@@ -74,10 +74,10 @@ def accuracy(y_pred, y_test):
     return "Accuracy : %d" % (accuracy_score(y_test, y_pred)*100)
 
 
-def main(categories, data):
+def main(categories, data, dev: bool):
     target = categories[0]
     # import the data without classification
-    path = './data.csv'
+    path = './data.csv' if not dev else './data-test.csv'
     df = importData(path)
     if(target in df.columns):
         target = "target"

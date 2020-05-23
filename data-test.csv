@@ -1,0 +1,4 @@
+id,toy,wheels,main colour,size,fluffy
+bike_001,Bike,true,green,big,false
+car_001,Toy Car,true,green,small,false
+lego_001,Lego,false,green,small,false
