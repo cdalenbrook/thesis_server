@@ -34,8 +34,12 @@ def predict():
         tree = utilities.get_tree(tree_id)
         targets = utilities.get_targets(tree_id)
         user_truth = utilities.get_usertruth(tree_id)
-        if(tree is None or targets is None or user_truth is None):
-            return "Your tree doesn\"t exist yet!", 404
+        if(tree is None):
+            return "Your tree doesn't exist yet!", 404
+        if(targets is None):
+            return "You haven't set any targets!", 404
+        if(user_truth is None):
+            return "You never gave us the truth!", 404
         y_pred = decisiontree.predict(tree, toy_id, user_truth, targets[0])
         print('Prediction: ', targets[y_pred[0]])
         return {"prediction": y_pred.tolist()}
