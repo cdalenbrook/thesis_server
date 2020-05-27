@@ -32,7 +32,7 @@ def get_tree(id: str):
 def get_targets(id: str):
     if(id in targets):
         return targets[id]
-    print("Could not find targets for: ", id)
+    print("Can't find targets for: ", id)
     return None
 
 
