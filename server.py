@@ -17,10 +17,12 @@ def handle_data():
         dev = request.json['dev']
         result = decisiontree.main(categories=category, data=data, dev=dev)
 
-        utilities.store_tree(user_id, result)
-        utilities.store_targets(user_id, request.json["category"])
-        utilities.store_usertruth(user_id, request.json["data"])
-        return "Great Success"
+        tree_json = utilities.store_tree(user_id, result)
+        return {
+            "tree": tree_json,
+            "user_truth": data,
+            "category": category
+        }
     except Exception as err:
         print(err)
         return "failed", 500
@@ -29,11 +31,11 @@ def handle_data():
 @app.route("/predict-category", methods=["POST"])
 def predict():
     try:
-        tree_id = request.args.get("id", "default")
+        tree_json = request.json["tree"]
         toy_id = request.json["toy_id"]
-        tree = utilities.get_tree(tree_id)
-        targets = utilities.get_targets(tree_id)
-        user_truth = utilities.get_usertruth(tree_id)
+        user_truth = request.json["user_truth"]
+        targets = request.json["category"]
+        tree = utilities.get_tree(tree_json)
         if(tree is None):
             return "Your tree doesn't exist yet!", 404
         if(targets is None):
