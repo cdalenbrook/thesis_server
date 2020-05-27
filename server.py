@@ -20,7 +20,7 @@ def handle_data():
         utilities.store_tree(user_id, result)
         utilities.store_targets(user_id, request.json["category"])
         utilities.store_usertruth(user_id, request.json["data"])
-        return "success"
+        return "Great Success"
     except Exception as err:
         print(err)
         return "failed", 500
