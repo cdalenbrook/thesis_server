@@ -14,12 +14,6 @@ def importData(path):
 
 
 def preprocess(df, target, data):
-    # make dummy variables for colours
-    dummies = pd.get_dummies(df['main colour'])
-    df = df.join(dummies)
-    df = df.drop('main colour', axis=1)
-    # change size into 5, 10, 15 (small, medium, big)
-    df['size'] = df['size'].map({'small': 5, 'medium': 10, 'big': 15})
     # col name = target, data matches to col
     df[target] = df['id'].map(data)
     cols_at_end = [target]
@@ -51,17 +45,9 @@ def train(X_train, y_train):
     return clf
 
 
-def predict(tree, toy_id, true_category, target, dev: bool):
-    path = get_data_path(dev)
-    print(path)
+def predict(tree, toy_id, true_category, target):
+    path = get_data_path(dev=False)
     df = importData(path)
-
-    # make dummy variables for colours
-    dummies = pd.get_dummies(df['main colour'])
-    df = df.join(dummies)
-    df = df.drop('main colour', axis=1)
-    # change size into 5, 10, 15 (small, medium, big)
-    df['size'] = df['size'].map({'small': 5, 'medium': 10, 'big': 15})
 
     X_test = df.loc[df['id'] == toy_id]
     X_test = X_test.drop('id', axis=1)

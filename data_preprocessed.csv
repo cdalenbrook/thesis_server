@@ -1,0 +1,15 @@
+id,toy,wheels,size,fluffy,blue,brown,green,multi,pink,red,white
+bike_001,Bike,True,15,False,0,0,1,0,0,0,0
+car_001,Toy Car,True,5,False,0,0,1,0,0,0,0
+lego_001,Lego,False,5,False,0,0,1,0,0,0,0
+trampoline_001,Trampoline,False,15,False,0,0,0,0,0,0,1
+doll_001,Doll,False,10,True,0,0,0,0,1,0,0
+teddy_001,Teddy,False,10,True,0,1,0,0,0,0,0
+xylophone_001,Xylophone,False,10,False,0,0,0,1,0,0,0
+scooter_001,Scooter,True,15,False,0,0,0,0,1,0,0
+slide_001,Slide,False,15,False,0,0,1,0,0,0,0
+swing_001,Swing,False,15,False,0,0,0,0,0,1,0
+piano_001,Piano,False,10,False,0,0,1,0,0,0,0
+train_001,Train,True,5,False,0,0,0,1,0,0,0
+tractor_001,Tractor,True,15,False,0,0,1,0,0,0,0
+play_doh_001,Play-Doh,False,5,False,1,0,0,0,0,0,0

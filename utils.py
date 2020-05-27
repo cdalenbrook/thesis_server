@@ -11,7 +11,7 @@ def store_tree(id: str, tree: DecisionTreeClassifier):
 
 
 def store_targets(id: str, target: List[str]):
-    targets[id] = target[0]
+    targets[id] = target
 
 
 def store_usertruth(id: str, data):
@@ -24,7 +24,7 @@ def get_tree(id: str):
     return None
 
 
-def get_target(id: str):
+def get_targets(id: str):
     if(id in targets):
         return targets[id]
     return None
@@ -37,4 +37,4 @@ def get_usertruth(id: str):
 
 
 def get_data_path(dev: bool) -> str:
-    return './data.csv' if not dev else './data-test.csv'
+    return './data_preprocessed.csv' if not dev else './data-test.csv'

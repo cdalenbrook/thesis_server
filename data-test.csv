@@ -1,5 +1,5 @@
-id,toy,wheels,main colour,size,fluffy
-bike_001,Bike,true,green,big,false
-car_001,Toy Car,true,green,small,false
-lego_001,Lego,false,green,small,false
-trampoline_001,Trampoline,false,white,big,false
+id,toy,wheels,size,fluffy,blue,brown,green,multi,pink,red,white
+bike_001,Bike,True,15,False,0,0,1,0,0,0,0
+car_001,Toy Car,True,5,False,0,0,1,0,0,0,0
+lego_001,Lego,False,5,False,0,0,1,0,0,0,0
+trampoline_001,Trampoline,False,15,False,0,0,0,0,0,0,1

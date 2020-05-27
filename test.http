@@ -3,6 +3,5 @@ POST http://127.0.0.1:5000/predict-category?id=12345 HTTP/1.1
 content-type: application/json
 
 {
-  "toy_id": "train_001",
-  "dev": true
+  "toy_id": "teddy_001"
 }
