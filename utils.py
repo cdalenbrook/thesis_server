@@ -4,7 +4,7 @@ import sklearn_json as skljson
 import json as JSON
 
 
-def store_tree(id: str, tree: DecisionTreeClassifier):
+def store_tree(tree: DecisionTreeClassifier):
     return skljson.to_dict(tree)
 
 
