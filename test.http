@@ -1,9 +1,9 @@
-#POST https://yuki-server-thesis.herokuapp.com/predict-category?id=12345 HTTP/1.1
-POST http://127.0.0.1:5000/predict-category HTTP/1.1
+POST https://yuki-server-thesis.herokuapp.com/predict-category HTTP/1.1
+# POST http://127.0.0.1:5000/predict-category HTTP/1.1
 content-type: application/json
 
 {
-  "toy_id": "teddy_001",
+  "toy_id": "doll_001",
   "category": [
     "outside",
     "inside"
@@ -14,16 +14,16 @@ content-type: application/json
       1
     ],
     "feature_importances_": [
-      0.2740175421212809,
-      0.7259824578787191,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0,
-      0.0
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
     ],
     "max_features_": 10,
     "meta": "decision-tree",
@@ -31,17 +31,17 @@ content-type: application/json
     "n_features_": 10,
     "n_outputs_": 1,
     "params": {
-      "ccp_alpha": 0.0,
+      "ccp_alpha": 0,
       "class_weight": null,
       "criterion": "entropy",
       "max_depth": null,
       "max_features": null,
       "max_leaf_nodes": null,
-      "min_impurity_decrease": 0.0,
+      "min_impurity_decrease": 0,
       "min_impurity_split": null,
       "min_samples_leaf": 1,
       "min_samples_split": 2,
-      "min_weight_fraction_leaf": 0.0,
+      "min_weight_fraction_leaf": 0,
       "presort": "deprecated",
       "random_state": 100,
       "splitter": "best"
@@ -108,32 +108,32 @@ content-type: application/json
       "values": [
         [
           [
-            2.0,
-            1.0
+            2,
+            1
           ]
         ],
         [
           [
-            1.0,
-            0.0
+            1,
+            0
           ]
         ],
         [
           [
-            1.0,
-            1.0
+            1,
+            1
           ]
         ],
         [
           [
-            1.0,
-            0.0
+            1,
+            0
           ]
         ],
         [
           [
-            0.0,
-            1.0
+            0,
+            1
           ]
         ]
       ]
