@@ -72,13 +72,14 @@ class FeatureSelectionGA():
         depths = []
         trees = []
         num_features = []
+        feat_importances = []
 
         # loop through genotypes in population and fit a tree to the given features and then find accuracy & depth
         for pop in population:
             clf = DecisionTreeClassifier(criterion="entropy", random_state=100)
             X = df[target].to_frame()
             count = 0
-            # if the feature is in the population (i.e. 1) then add it to the features in X (i.e. what the tree will train on)
+            # if the feature is in the population (i.e. 1) then add it to the features in X
             for feature in pop:
                 if feature == 1:
                     X = pd.concat([X, df.iloc[:, count]], axis=1)
@@ -88,9 +89,10 @@ class FeatureSelectionGA():
             # if there are no features in the final column, skip this population
             if X.empty:
                 accuracies.append(0)
-                depths.apppend(0)
+                depths.append(0)
                 trees.append(None)
                 num_features.append(0)
+                feat_importances.append(0)
                 print('No Tree Made')
                 continue
             # make the target column the y values
@@ -121,20 +123,25 @@ class FeatureSelectionGA():
             # get the depth of the DT for current pop
             tree_depth = clf.tree_.max_depth
             # add both values to their respective arrays
+            feat_importances.append(feature_importances)
             accuracies.append(pop_accuracy)
             depths.append(tree_depth)
             trees.append(clf)
+
             # add the number of features used in training to the list of num features
-            num_features.append(len(X.columns))
+            num_features.append(sum(pop))
+        print('trees fitted')
+        return accuracies, depths, trees, num_features, feat_importances
 
-        return accuracies, depths, trees, num_features
-
+    # get the fitnesses of the genomes in the current population
     def get_fitness(self, accuracies: list, depths: list, num_features: list):
         # fitness aims to have high depth, high accuracy and low number of features
         alpha = 0.7
         fitnesses = [0] * len(accuracies)
         for i in range(len(accuracies)):
-            fitnesses[i] = depths[i] + accuracies[i] - num_features[i]
+            fitnesses[i] = depths[i] + \
+                2*accuracies[i] - (0.5*num_features[i])
+        print('fitnesses calculated')
         return fitnesses
 
     def tournament_selection(self, population: list, fitnesses: list):
@@ -148,26 +155,30 @@ class FeatureSelectionGA():
         best = tournament_members[0]
         best_fitness = 0
         # pick the 2 best individuals from the tournament
-        while(len(parents) < 2):
+        while(len(parents) < 4):
             for i in range(len(tournament_members)):
                 if fitnesses[i] > best_fitness:
                     best = tournament_members[i]
                     best_fitness = fitnesses[i]
             parents.append(best)
             fitness_parents.append(best_fitness)
-
+        print('tournament completed')
         return parents, fitness_parents
 
     # get the crossover of the fittest in the population
-    def crossover(self, parents: list, fitnesses: list, population: list):
-        # get 2 members of the population from tournament selection
+    def crossover(self, parents: list):
+        # get 4 fittest members of the population from tournament selection
         children = parents
         # crossover their attributes
         for i in range(len(parents[0])):
             if random.random() < self.crossover_prob:
                 children[0][i], children[1][i] = parents[1][i], parents[0][i]
+            if random.random() < self.crossover_prob:
+                children[2][i], children[3][i] = parents[3][i], parents[2][i]
+        print('crossover performed')
         return children
 
+    # mutate the children with probability pm
     def mutate(self, children: list):
         mutants = children
         for genotype in children:
@@ -175,6 +186,7 @@ class FeatureSelectionGA():
                 random_val = random.random()
                 if random_val < self.mutation_prob:
                     genotype[i] = 1 - genotype[i]
+        print('mutation performed')
         return mutants
 
     def optimize(self):
@@ -190,16 +202,17 @@ class FeatureSelectionGA():
         pop = initial_pop
 
         for i in range(self.num_gens):
-            accuracies, depths, trees, num_features = self.fit_trees(
+            accuracies, depths, trees, num_features, feature_importances = self.fit_trees(
                 pop, df, target)
             fitnesses = self.get_fitness(accuracies, depths, num_features)
+            print(fitnesses)
             parents, fitness_parents = self.tournament_selection(
                 pop, fitnesses)
-            children = self.crossover(parents, fitnesses, pop)
+            children = self.crossover(parents)
             mutants = self.mutate(children)
             new_population = []
             # add the parents and the mutants to the next population
-            for i in range(2):
+            for i in range(4):
                 new_population.append(parents[i])
                 new_population.append(mutants[i])
             # make the rest of the population random
@@ -209,15 +222,18 @@ class FeatureSelectionGA():
             pop = new_population
 
         print('Final Population: \n', pop)
-        print(trees)
-        return pop, trees, df, fitnesses, accuracies, depths
+        return pop, trees, df, fitnesses, accuracies, depths, feature_importances
 
-    def display_optimized_pop(self, pop: list, trees: list, df: pd.DataFrame, fitnesses: list, accuracies: list, depths: list):
+    def display_optimized_pop(self, pop: list, trees: list, df: pd.DataFrame, fitnesses: list, accuracies: list, depths: list, feature_importances: list):
         fittest_idx = fitnesses.index(max(fitnesses))
+        print('Fittest Index: ', fittest_idx)
         fittest = pop[fittest_idx]
-        print(fittest)
+        print('Fittest Individual: ', fittest)
+
+        print('Feature Importances: ', feature_importances[fittest_idx])
 
         features = list(df.columns)
+        features.pop()
         best_features = []
         for i in range(len(fittest)):
             if(fittest[i] == 1):
@@ -225,12 +241,12 @@ class FeatureSelectionGA():
 
         print('Most Important Features', best_features)
 
-        print(trees[fittest_idx].feature_importances_)
         print('Accuracy: ', accuracies[fittest_idx])
         print('Depth: ', depths[fittest_idx])
+        print('Fitness: ', fitnesses[fittest_idx])
 
         clf = trees[fittest_idx]
-        fn = best_features
+        fn = features
         cn = ['inside', 'outside']
         fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(25, 10), dpi=300)
         plot_tree(clf, feature_names=fn, class_names=cn,
@@ -242,5 +258,6 @@ path = "./data_categorized.csv"
 df = pd.read_csv(path)
 ga = FeatureSelectionGA(df, df_type='toys', crossover_prob=0.6,
                         mutation_prob=0.2, tournament_size=6, num_gens=10)
-pop, trees, df, fitnesses, accuracies, depths = ga.optimize()
-ga.display_optimized_pop(pop, trees, df, fitnesses, accuracies, depths)
+pop, trees, df, fitnesses, accuracies, depths, feature_importances = ga.optimize()
+ga.display_optimized_pop(pop, trees, df, fitnesses,
+                         accuracies, depths, feature_importances)
