@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 
 class FeatureSelectionGA():
-    def __init__(self, df, df_type: str, crossover_prob: float,  mutation_prob: float, tournament_size: int, num_gens: int):
+    def __init__(self, df, df_type: str, crossover_prob: float,  mutation_prob: float, tournament_size: int, num_gens: int, population_size: int):
         super().__init__()
         self.df = df
         self.df_type = df_type
@@ -17,11 +17,12 @@ class FeatureSelectionGA():
         self.mutation_prob = mutation_prob
         self.tournament_size = tournament_size
         self.num_gens = num_gens
+        self.population_size = population_size
 
-    def generate_initial_pop(self, population_size: int):
+    def generate_initial_pop(self, individual_size: int, population_size: int):
         # generate a random population of genotypes
         initial_pop = [[random.randint(0, 1) for i in range(
-            population_size)] for j in range(population_size)]
+            individual_size)] for j in range(self.population_size)]
         return initial_pop
 
     def preprocess_toys(self, df: pd.DataFrame):
@@ -74,19 +75,19 @@ class FeatureSelectionGA():
         num_features = []
         feat_importances = []
 
-        # loop through genotypes in population and fit a tree to the given features and then find accuracy & depth
-        for pop in population:
+        # loop through individuals in population and fit a tree to the given features and then find accuracy & depth
+        for individual in population:
             clf = DecisionTreeClassifier(criterion="entropy", random_state=100)
             X = df[target].to_frame()
             count = 0
-            # if the feature is in the population (i.e. 1) then add it to the features in X
-            for feature in pop:
+            # if the feature is in the individual (i.e. 1) then add it to the features in X
+            for feature in individual:
                 if feature == 1:
                     X = pd.concat([X, df.iloc[:, count]], axis=1)
                 count += 1
             # remove the target column from the X values
             X = X.drop(target, 1)
-            # if there are no features in the final column, skip this population
+            # if there are no features in the final column, skip this individual
             if X.empty:
                 accuracies.append(0)
                 depths.append(0)
@@ -103,33 +104,33 @@ class FeatureSelectionGA():
             # fit the tree to the given training values
             clf = clf.fit(X_train, y_train)
 
-            # take the features out of the population that are not used in the tree
+            # take the features out of the individual that are not used in the tree
             feature_importances = clf.feature_importances_
             change = []
             for j in range(len(feature_importances)):
                 if feature_importances[j] == 0:
                     change.append(j)
             count = 0
-            for k in range(len(pop)):
-                if pop[k] == 1:
+            for k in range(len(individual)):
+                if individual[k] == 1:
                     if count in change:
-                        pop[k] = 0
+                        individual[k] = 0
                     count += 1
 
             # make predictions according to the fitted tree
             y_pred = clf.predict(X_test)
-            # get the accuracy of the DT for current population
-            pop_accuracy = accuracy_score(y_test, y_pred)
+            # get the accuracy of the DT for current individual
+            individual_accuracy = accuracy_score(y_test, y_pred)
             # get the depth of the DT for current pop
             tree_depth = clf.tree_.max_depth
             # add both values to their respective arrays
             feat_importances.append(feature_importances)
-            accuracies.append(pop_accuracy)
+            accuracies.append(individual_accuracy)
             depths.append(tree_depth)
             trees.append(clf)
 
             # add the number of features used in training to the list of num features
-            num_features.append(sum(pop))
+            num_features.append(sum(individual))
         print('trees fitted')
         return accuracies, depths, trees, num_features, feat_importances
 
@@ -197,8 +198,9 @@ class FeatureSelectionGA():
             df = self.preprocess_cars(self.df)
             target = 'decision'
 
-        population_size = len(df.columns)-1
-        initial_pop = self.generate_initial_pop(population_size)
+        individual_size = len(df.columns)-1
+        initial_pop = self.generate_initial_pop(
+            individual_size, self.population_size)
         pop = initial_pop
 
         for i in range(self.num_gens):
@@ -216,9 +218,9 @@ class FeatureSelectionGA():
                 new_population.append(parents[i])
                 new_population.append(mutants[i])
             # make the rest of the population random
-            while(len(new_population) < population_size):
+            while(len(new_population) < self.population_size):
                 new_population.append([random.randint(0, 1)
-                                       for i in range(population_size)])
+                                       for i in range(individual_size)])
             pop = new_population
 
         print('Final Population: \n', pop)
@@ -257,7 +259,7 @@ class FeatureSelectionGA():
 path = "./data_categorized.csv"
 df = pd.read_csv(path)
 ga = FeatureSelectionGA(df, df_type='toys', crossover_prob=0.6,
-                        mutation_prob=0.2, tournament_size=6, num_gens=10)
+                        mutation_prob=0.2, tournament_size=6, num_gens=10, population_size=20)
 pop, trees, df, fitnesses, accuracies, depths, feature_importances = ga.optimize()
 ga.display_optimized_pop(pop, trees, df, fitnesses,
                          accuracies, depths, feature_importances)
