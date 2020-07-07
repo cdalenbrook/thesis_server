@@ -24,10 +24,10 @@ def display_optimized_pop(pop: list, trees: list, df: pd.DataFrame, fitnesses: l
     print('Depth: ', depths[fittest_idx])
     print('Fitness: ', fitnesses[fittest_idx])
 
-    # clf = trees[fittest_idx]
-    # fn = features
-    # cn = ['inside', 'outside']
-    # fig, _ = plt.subplots(nrows=1, ncols=1, figsize=(25, 10), dpi=300)
-    # plot_tree(clf, feature_names=fn, class_names=cn,
-    #           filled=True, rounded=True, fontsize=14)
-    # fig.savefig('best-tree.png')
+    clf = trees[fittest_idx]
+    fn = features
+    cn = ['inside', 'outside']
+    fig, _ = plt.subplots(nrows=1, ncols=1, figsize=(25, 10), dpi=300)
+    plot_tree(clf, feature_names=fn, class_names=cn,
+              filled=True, rounded=True, fontsize=14)
+    fig.savefig('best-tree.png')

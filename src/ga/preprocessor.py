@@ -54,5 +54,4 @@ class ToysPreprocessor(Preprocessor):
         # make last column contain the class values
         df = df[[c for c in df if c not in ['outside']]
                 + [c for c in ['outside'] if c in df]]
-        # print('preprocessed DF', df)
         return df
