@@ -1,7 +1,54 @@
-individual = [0, 1, 1]
-feature_importances = [0.0, 0.111]
+# import pandas as pd
+# from sklearn.tree import DecisionTreeClassifier
+# from sklearn.metrics import accuracy_score
+# from sklearn.model_selection import train_test_split
 
+# df = pd.read_csv('data/car_evaluation.csv')
+# df.columns = ['buying price', 'maintenance cost', 'number of doors',
+#               'number of persons', 'lug_boot', 'safety', 'decision']
+# # map categorical values to numbers
+# df['buying price'] = df['buying price'].map(
+#     {'low': 5, 'medium': 10, 'high': 15, 'vhigh': 20})
+# df['maintenance cost'] = df['maintenance cost'].map(
+#     {'low': 5, 'medium': 10, 'high': 15, 'vhigh': 20})
+# df['lug_boot'] = df['lug_boot'].map(
+#     {'small': 5, 'med': 10, 'big': 15})
+# df['safety'] = df['safety'].map(
+#     {'low': 5, 'med': 10, 'high': 15})
+# df['decision'] = df['decision'].map(
+#     {'unacc': 0, 'acc': 10, 'good': 10, 'vgood': 10})
 
-change = filter(lambda x: x > 0.0, feature_importances)
-# [1]
-ind = map(lambda x: 0 if (x == 1) and (x in change) else x, individual)
+# # map non-numbers to numbers
+# df['number of doors'].replace({'5more': 5}, inplace=True)
+# df['number of persons'].replace({'more': 6}, inplace=True)
+
+# # fill in NaN with average
+# df['maintenance cost'].fillna(
+#     df['maintenance cost'].mean(), inplace=True)
+# df['buying price'].fillna(df['buying price'].mean(), inplace=True)
+
+# clf = DecisionTreeClassifier(criterion="entropy", random_state=100)
+
+# X = df.iloc[:, 0:12]
+# y = df.iloc[:, -1]
+
+# X_train, X_test, y_train, y_test = train_test_split(
+#     X, y, test_size=0.2, random_state=100)
+# clf = clf.fit(X_train, y_train)
+# y_pred = clf.predict(X_test)
+# acc = accuracy_score(y_test, y_pred)
+
+# print(acc)
+
+import random
+
+parents = [[0, 0, 0, 0], [1, 1, 1, 1], [0, 1, 0, 1], [1, 0, 1, 0]]
+children = parents
+# crossover their attributes
+for i in range(len(parents[0])):
+    if random.random() < 1:
+        children[0][i], children[1][i] = parents[1][i], parents[0][i]
+    if random.random() < 1:
+        children[2][i], children[3][i] = parents[3][i], parents[2][i]
+
+print(children)

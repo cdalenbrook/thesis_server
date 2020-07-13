@@ -20,14 +20,21 @@ def display_optimized_pop(pop: list, trees: list, df: pd.DataFrame, fitnesses: l
 
     print('Most Important Features', best_features)
 
-    print('Accuracy: ', accuracies[fittest_idx])
-    print('Depth: ', depths[fittest_idx])
-    print('Fitness: ', fitnesses[fittest_idx])
+    accuracy = accuracies[fittest_idx]
+    depth = depths[fittest_idx]
+    fitness = fitnesses[fittest_idx]
 
-    clf = trees[fittest_idx]
-    fn = features
-    cn = ['inside', 'outside']
-    fig, _ = plt.subplots(nrows=1, ncols=1, figsize=(25, 10), dpi=300)
-    plot_tree(clf, feature_names=fn, class_names=cn,
-              filled=True, rounded=True, fontsize=14)
-    fig.savefig('best-tree.png')
+    print('Accuracy: ', accuracy)
+    print('Depth: ', depth)
+    print('Fitness: ', fitness)
+
+    # clf = trees[fittest_idx]
+    # fn = features
+    # # cn = ['inside', 'outside']
+    # cn = ['unacc', 'acc', 'good', 'vgood']
+    # fig, _ = plt.subplots(nrows=1, ncols=1, figsize=(25, 10), dpi=300)
+    # plot_tree(clf, feature_names=fn, class_names=cn,
+    #           filled=True, rounded=True, fontsize=14)
+    # fig.savefig('ga_best_tree.png')
+
+    return accuracy, depth, fitness, best_features

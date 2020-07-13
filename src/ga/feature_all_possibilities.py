@@ -7,23 +7,23 @@ from sklearn.metrics import accuracy_score
 import heapq
 from matplotlib import pyplot as plt
 from preprocessor import Preprocessor
+from preprocessor import ToysPreprocessor
 from tqdm import tqdm
 import functools
 
 
-class FeatureSelectionGA():
-    def __init__(self, dataframe: pd.DataFrame.T, target: str, preprocessor: Preprocessor, crossover_prob: float,  mutation_prob: float, tournament_size: int, num_gens: int):
+class FeatureSelectionAllPosibilities():
+    def __init__(self, preprocessor: Preprocessor, dataframe: pd.DataFrame.T, crossover_prob: float,  mutation_prob: float, tournament_size: int, num_gens: int):
         super().__init__()
-        self.df = preprocessor.preprocess(dataframe, target)
-        self.target = target
+        self.df = preprocessor.preprocess(dataframe, 'outside')
         self.crossover_prob = crossover_prob
         self.mutation_prob = mutation_prob
         self.tournament_size = tournament_size
         self.num_gens = num_gens
-        self.population_size = len(self.df.columns)-1
+        self.population_size = 12
         self.initial_pop = self.generate_initial_pop()
         self.pop = self.initial_pop.copy()
-        # print("Initial Population Size: ", self.population_size)
+        self.values = ['outside', 'girls', 'green', 'big', 'has_wheels']
 
     def generate_initial_pop(self):
         # generate a random population of genotypes
@@ -43,70 +43,73 @@ class FeatureSelectionGA():
 
         # loop through genotypes in population and fit a tree to the given features and then find accuracy & depth
         for genotype in self.pop:
+            depth_sum = 0
+            accuracy_sum = 0
+            for value in self.values:
+                clf = DecisionTreeClassifier(
+                    criterion="entropy", random_state=100)
+                path = 'data/data_categorized_' + value + '.csv'
+                target_df = pd.read_csv(path)
 
-            individual = genotype.copy()
-            clf = DecisionTreeClassifier(criterion="entropy", random_state=100)
-            X = self.df[self.target].to_frame()
-            count = 0
-            # if the feature is in the population (i.e. 1) then add it to the features in X
-            for feature in individual:
-                if feature == 1:
-                    X = pd.concat([X, self.df.iloc[:, count]], axis=1)
-                count += 1
-            # remove the target column from the X values
-            X = X.drop(self.target, 1)
+                individual = genotype.copy()
 
-            # if there are no features in the final column, skip this population
-            if X.empty:
-                new_pop.append(individual)
-                accuracies.append(0)
-                depths.append(0)
-                trees.append([0])
-                num_features.append(0)
-                feat_importances.append([0])
-                continue
-            # make the target column the y values
-            y = self.df.iloc[:, -1]
+                X = target_df[value].to_frame()
 
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=0.2, random_state=100)
-            # fit the tree to the given training values
-            clf = clf.fit(X_train, y_train)
-
-            # take the features out of the population that are not used in the tree
-            feature_importances = clf.feature_importances_
-            change = []
-            for j in range(len(feature_importances)):
-                if feature_importances[j] == 0:
-                    change.append(j)
-            count = 0
-            for k in range(len(individual)):
-                if individual[k] == 1:
-                    if count in change:
-                        individual[k] = 0
+                count = 0
+                # if the feature is in the population (i.e. 1) then add it to the features in X
+                for feature in individual:
+                    if feature == 1:
+                        X = pd.concat([X, self.df.iloc[:, count]], axis=1)
                     count += 1
+                # remove the target column from the X values
+                X = X.drop(value, 1)
 
-            new_pop.append(individual)
+                # if there are no features in the final column, skip this population
+                if X.empty:
+                    accuracy_sum += 0
+                    depth_sum += 0
+                    continue
 
-            # make predictions according to the fitted tree
-            y_pred = clf.predict(X_test)
-            # get the accuracy of the DT for current population
-            pop_accuracy = accuracy_score(y_test, y_pred)
-            # get the depth of the DT for current pop
-            tree_depth = clf.tree_.max_depth
-            # add both values to their respective arrays
-            feat_importances.append(feature_importances)
-            accuracies.append(pop_accuracy)
-            depths.append(tree_depth)
-            trees.append(clf)
+                # make the target column the y values
+                y = target_df.iloc[:, -1]
 
-            # add the number of features used in training to the list of num features
-            individual_num_features = sum(individual)
-            num_features.append(individual_num_features)
+                X_train, X_test, y_train, y_test = train_test_split(
+                    X, y, test_size=0.2, random_state=100)
+                # fit the tree to the given training values
+                clf = clf.fit(X_train, y_train)
+
+                # take the features out of the population that are not used in the tree
+                feature_importances = clf.feature_importances_
+                change = []
+                for j in range(len(feature_importances)):
+                    if feature_importances[j] == 0:
+                        change.append(j)
+                count = 0
+                for k in range(len(individual)):
+                    if individual[k] == 1:
+                        if count in change:
+                            individual[k] = 0
+                        count += 1
+
+                # make predictions according to the fitted tree
+                y_pred = clf.predict(X_test)
+                # get the accuracy of the DT for current population
+                pop_accuracy = accuracy_score(y_test, y_pred)
+                # get the depth of the DT for current pop
+                tree_depth = clf.tree_.max_depth
+
+                accuracy_sum += (pop_accuracy)
+                depth_sum += tree_depth
+
+            accuracy = (accuracy_sum/len(self.values))
+            depth = (depth_sum/len(self.values))
+
+            new_pop.append(genotype)
+            accuracies.append(accuracy)
+            depths.append(depth)
 
         self.pop = new_pop.copy()
-
-        return accuracies, depths, trees, num_features, feat_importances
+        return accuracies, depths
 
     # get the fitnesses of the genomes in the current population
     def get_fitness(self, accuracies: list, depths: list):
@@ -128,7 +131,7 @@ class FeatureSelectionGA():
             fitnesses_tmembers = []
             # choose individuals randomly from the population
             for i in range(self.tournament_size):
-                random_int = random.randint(0, len(self.pop)-1)
+                random_int = random.randint(0, (len(self.pop)-1))
                 tournament_members.append(self.pop[random_int])
                 fitnesses_tmembers.append(fitnesses[random_int])
 
@@ -166,7 +169,7 @@ class FeatureSelectionGA():
 
     def optimize(self):
         for i in tqdm(range(self.num_gens)):
-            accuracies, depths, trees, num_features, feature_importances = self.fit_trees()
+            accuracies, depths = self.fit_trees()
             fitnesses = self.get_fitness(accuracies, depths)
             parents = self.tournament_selection(fitnesses)
             children = self.crossover(parents)
@@ -183,7 +186,16 @@ class FeatureSelectionGA():
             self.pop = new_population.copy()
 
         # calculate info for final population
-        accuracies, depths, trees, num_features, feature_importances = self.fit_trees()
+        accuracies, depths = self.fit_trees()
         fitnesses = self.get_fitness(accuracies, depths)
 
-        return self.pop, trees, self.df, fitnesses, accuracies, depths, feature_importances
+        return self.pop, self.df, fitnesses, accuracies, depths
+
+
+df = pd.read_csv('data/data_categorized_outside.csv')
+ga = FeatureSelectionAllPosibilities(ToysPreprocessor(
+), dataframe=df, crossover_prob=0.6, mutation_prob=0.2, tournament_size=8, num_gens=10)
+
+pop, df, fitnesses, accuracies, depths = ga.optimize()
+
+print(accuracies)
