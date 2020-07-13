@@ -1,14 +1,20 @@
 import pandas as pd
 from feature_selection_ga import FeatureSelectionGA
+from feature_all_possibilities import FeatureSelectionAllPosibilities
 from preprocessor import ToysPreprocessor, CarsPreprocessor
 from display import display_optimized_pop
 
 if __name__ == "__main__":
     for i in range(10):
+        # path of dataset to preprocess
         path = "data/data_categorized_outside.csv"
         df = pd.read_csv(path)
+        # select the target variable
         target = 'outside'
+        # select which data set to preprocess
         pre = ToysPreprocessor()
+
+        # select which feature selection (one target variable - FeatureSelectionGA or several - FeatureSelectionAllPosibilities)
         ga = FeatureSelectionGA(
             df,
             target=target,
@@ -31,6 +37,7 @@ if __name__ == "__main__":
             feature_importances=feature_importances,
         )
 
+        # print data to text file
         print('New Run', file=open("experimental_output.txt", "a"))
         print(i, file=open("experimental_output.txt", "a"))
         print(accuracy, file=open("experimental_output.txt", "a"))

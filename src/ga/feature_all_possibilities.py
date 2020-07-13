@@ -192,10 +192,36 @@ class FeatureSelectionAllPosibilities():
         return self.pop, self.df, fitnesses, accuracies, depths
 
 
-df = pd.read_csv('data/data_categorized_outside.csv')
-ga = FeatureSelectionAllPosibilities(ToysPreprocessor(
-), dataframe=df, crossover_prob=0.6, mutation_prob=0.2, tournament_size=8, num_gens=10)
+for j in range(10):
+    df = pd.read_csv('data/data_categorized_outside.csv')
+    ga = FeatureSelectionAllPosibilities(ToysPreprocessor(
+    ), dataframe=df, crossover_prob=0.6, mutation_prob=0.2, tournament_size=8, num_gens=1000)
 
-pop, df, fitnesses, accuracies, depths = ga.optimize()
+    pop, df, fitnesses, accuracies, depths = ga.optimize()
 
-print(accuracies)
+    fittest_idx = fitnesses.index(max(fitnesses))
+    print('Fittest Index: ', fittest_idx)
+    fittest = pop[fittest_idx]
+    print('Fittest Individual: ', fittest)
+
+    avg_accuracy = accuracies[fittest_idx]
+    print('Average Accuracy: ', avg_accuracy)
+
+    avg_depth = depths[fittest_idx]
+    print('Average Depth: ', avg_depth)
+
+    features = list(df.columns)
+    features.pop()
+    best_features = []
+    for i in range(len(fittest)):
+        if(fittest[i] == 1):
+            best_features.append(features[i])
+
+    print('Most Important Features', best_features)
+
+    print('New Run', file=open("experimental_output.txt", "a"))
+    print(j, file=open("experimental_output.txt", "a"))
+    print(avg_accuracy, file=open("experimental_output.txt", "a"))
+    print(avg_depth, file=open("experimental_output.txt", "a"))
+    print(fittest, file=open("experimental_output.txt", "a"))
+    print(best_features, file=open("experimental_output.txt", "a"))
