@@ -46,12 +46,15 @@ class ToysPreprocessor(Preprocessor):
         super().preprocess(df, target)
         # remove ID and name columns
         df = df.drop(['id', 'toy'], axis=1)
-        for column in df:
-            # one hot encode string values and remove their corresponding columns
-            if df[column].dtype == object:
-                one_hot_enc = pd.get_dummies(df[column])
-                df = pd.concat([df, one_hot_enc], axis=1)
-                df = df.drop([column], axis=1)
+
+        # one_hot_enc = pd.get_dummies(df['main colour'])
+        # df = pd.concat([df, one_hot_enc], axis=1)
+        # df = df.drop(['main colour'], axis=1)
+        df['main colour'] = df['main colour'].map(
+            {'blue': 5, 'brown': 10, 'green': 15, 'multi': 20, 'pink': 25, 'red': 30, 'white': 35})
+
+        df['size'] = df['size'].map(
+            {'small': 5, 'medium': 10, 'big': 15})
         # make last column contain the class values
         df = df[[c for c in df if c not in [target]]
                 + [c for c in [target] if c in df]]

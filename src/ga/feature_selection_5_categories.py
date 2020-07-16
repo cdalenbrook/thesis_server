@@ -6,21 +6,22 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import heapq
 from matplotlib import pyplot as plt
-from preprocessor import Preprocessor
-from preprocessor import ToysPreprocessor
+from preprocessor import Preprocessor, ToysPreprocessor
 from tqdm import tqdm
 import functools
+import copy
 
 
-class FeatureSelectionAllPosibilities():
-    def __init__(self, preprocessor: Preprocessor, dataframe: pd.DataFrame.T, crossover_prob: float,  mutation_prob: float, tournament_size: int, num_gens: int):
+class FeatureSelection5Categories():
+    def __init__(self, target: str, pre: Preprocessor, dataframe: pd.DataFrame.T, crossover_prob: float,  mutation_prob: float, tournament_size: int, num_gens: int):
         super().__init__()
-        self.df = preprocessor.preprocess(dataframe, 'outside')
+        self.df = pre.preprocess(dataframe, target)
         self.crossover_prob = crossover_prob
         self.mutation_prob = mutation_prob
         self.tournament_size = tournament_size
         self.num_gens = num_gens
-        self.population_size = 12
+        self.population_size = 30
+        self.individual_size = len(self.df.columns)-1
         self.initial_pop = self.generate_initial_pop()
         self.pop = self.initial_pop.copy()
         self.values = ['outside', 'girls', 'green', 'big', 'has_wheels']
@@ -28,7 +29,7 @@ class FeatureSelectionAllPosibilities():
     def generate_initial_pop(self):
         # generate a random population of genotypes
         initial_pop = [[random.randint(0, 1) for i in range(
-            self.population_size)] for j in range(self.population_size)]
+            self.individual_size)] for j in range(self.population_size)]
         return initial_pop
 
     def fit_trees(self):
@@ -116,45 +117,62 @@ class FeatureSelectionAllPosibilities():
         # fitness aims to have high depth, high accuracy and low number of features
         fitnesses = [0] * len(accuracies)
         for i in range(len(accuracies)):
-            if(depths[i] > 4):
-                fitnesses[i] = -1 + 4*accuracies[i]
+            if(depths[i] > 3):
+                fitnesses[i] = -1 + (4*accuracies[i])
             else:
-                fitnesses[i] = depths[i] + \
-                    4*accuracies[i]
+                fitnesses[i] = depths[i] + (4*accuracies[i])
         return fitnesses
 
     def tournament_selection(self, fitnesses: list):
         parents = []
-
+        curr_fit = copy.deepcopy(fitnesses)
+        curr_pop = copy.deepcopy(self.pop)
         while(len(parents) < 4):
             tournament_members = []
             fitnesses_tmembers = []
             # choose individuals randomly from the population
-            for i in range(self.tournament_size):
-                random_int = random.randint(0, (len(self.pop)-1))
-                tournament_members.append(self.pop[random_int])
-                fitnesses_tmembers.append(fitnesses[random_int])
+            for i in range(4):
+                random_int = random.randint(0, len(curr_pop)-1)
+                tournament_members.append(curr_pop[random_int])
+                fitnesses_tmembers.append(curr_fit[random_int])
 
-            best = tournament_members[0]
-            best_fitness = 0
-            # pick the best individuals from the tournament
-            for i in range(len(tournament_members)):
-                if fitnesses_tmembers[i] > best_fitness:
-                    best = tournament_members[i]
+            # find the fittest out of this random selection
+            best_idx = fitnesses_tmembers.index(max(fitnesses_tmembers))
+            best = tournament_members[best_idx]
             parents.append(best)
+            curr_fit.pop(best_idx)
+            curr_pop.pop(best_idx)
+        return parents
 
+    def elistist_selection(self, fitnesses: list):
+        parents = []
+        curr_fit = copy.deepcopy(fitnesses)
+        curr_pop = copy.deepcopy(self.pop)
+        while(len(parents) < 4):
+            # find the fittest out of this random selection
+            best_idx = curr_fit.index(max(curr_fit))
+            best = curr_pop[best_idx]
+            parents.append(best)
+            curr_fit.pop(best_idx)
+            curr_pop.pop(best_idx)
         return parents
 
     # get the crossover of the fittest in the population
     def crossover(self, parents: list):
         # get 4 fittest members of the population from tournament selection
-        children = parents
+        children = copy.deepcopy(parents)
         # crossover their attributes
         for i in range(len(parents[0])):
             if random.random() < self.crossover_prob:
-                children[0][i], children[1][i] = parents[1][i], parents[0][i]
+                temp_1 = parents[1][i]
+                temp_2 = parents[0][i]
+                children[0][i] = temp_1
+                children[1][i] = temp_2
             if random.random() < self.crossover_prob:
-                children[2][i], children[3][i] = parents[3][i], parents[2][i]
+                temp_3 = parents[3][i]
+                temp_4 = parents[2][i]
+                children[2][i] = temp_3
+                children[3][i] = temp_4
         return children
 
     # mutate the children with probability pm
@@ -168,10 +186,18 @@ class FeatureSelectionAllPosibilities():
         return mutants
 
     def optimize(self):
+        generation_acc = []
+        generation_fit = []
         for i in tqdm(range(self.num_gens)):
             accuracies, depths = self.fit_trees()
+            acc = max(accuracies)
+            generation_acc.append(acc)
+
             fitnesses = self.get_fitness(accuracies, depths)
-            parents = self.tournament_selection(fitnesses)
+            fittest = max(fitnesses)
+            generation_fit.append(fittest)
+
+            parents = self.elistist_selection(fitnesses)
             children = self.crossover(parents)
             mutants = self.mutate(children)
             new_population = []
@@ -182,46 +208,58 @@ class FeatureSelectionAllPosibilities():
             # make the rest of the population random
             while(len(new_population) < self.population_size):
                 new_population.append([random.randint(0, 1)
-                                       for i in range(self.population_size)])
+                                       for i in range(self.individual_size)])
             self.pop = new_population.copy()
 
         # calculate info for final population
         accuracies, depths = self.fit_trees()
         fitnesses = self.get_fitness(accuracies, depths)
 
-        return self.pop, self.df, fitnesses, accuracies, depths
+        acc = max(accuracies)
+        generation_acc.append(acc)
+        fittest = max(fitnesses)
+        generation_fit.append(fittest)
+
+        return self.pop, self.df, fitnesses, accuracies, depths, generation_acc, generation_fit
 
 
-for j in range(10):
-    df = pd.read_csv('data/data_categorized_outside.csv')
-    ga = FeatureSelectionAllPosibilities(ToysPreprocessor(
-    ), dataframe=df, crossover_prob=0.6, mutation_prob=0.2, tournament_size=8, num_gens=1000)
+# if __name__ == "__main__":
+#     for j in range(10):
+#         df = pd.read_csv('data/data_categorized_outside.csv')
+#         ga = FeatureSelection5Categories(pre=ToysPreprocessor(
+#         ), target='outside', dataframe=df, crossover_prob=0.6, mutation_prob=0.2, tournament_size=8, num_gens=100)
 
-    pop, df, fitnesses, accuracies, depths = ga.optimize()
+#         pop, df, fitnesses, accuracies, depths, generation_acc, generation_fit = ga.optimize()
 
-    fittest_idx = fitnesses.index(max(fitnesses))
-    print('Fittest Index: ', fittest_idx)
-    fittest = pop[fittest_idx]
-    print('Fittest Individual: ', fittest)
+#         # plt.plot(generation_fit)
+#         # plt.show()
 
-    avg_accuracy = accuracies[fittest_idx]
-    print('Average Accuracy: ', avg_accuracy)
+#         fittest_idx = fitnesses.index(max(fitnesses))
+#         print('Fittest Index: ', fittest_idx)
+#         fittest = pop[fittest_idx]
+#         print('Fittest Individual: ', fittest)
 
-    avg_depth = depths[fittest_idx]
-    print('Average Depth: ', avg_depth)
+#         avg_accuracy = accuracies[fittest_idx]
+#         print('Average Accuracy: ', avg_accuracy)
 
-    features = list(df.columns)
-    features.pop()
-    best_features = []
-    for i in range(len(fittest)):
-        if(fittest[i] == 1):
-            best_features.append(features[i])
+#         avg_depth = depths[fittest_idx]
+#         print('Average Depth: ', avg_depth)
 
-    print('Most Important Features', best_features)
+#         features = list(df.columns)
+#         features.pop()
+#         best_features = []
+#         for i in range(len(fittest)):
+#             if(fittest[i] == 1):
+#                 best_features.append(features[i])
 
-    print('New Run', file=open("experimental_output.txt", "a"))
-    print(j, file=open("experimental_output.txt", "a"))
-    print(avg_accuracy, file=open("experimental_output.txt", "a"))
-    print(avg_depth, file=open("experimental_output.txt", "a"))
-    print(fittest, file=open("experimental_output.txt", "a"))
-    print(best_features, file=open("experimental_output.txt", "a"))
+#         print('Most Important Features', best_features)
+
+#         print('New Run', file=open("experimental_output.txt", "a"))
+#         print(j, file=open("experimental_output.txt", "a"))
+#         print('avg_accuracy', file=open("experimental_output.txt", "a"))
+#         print(avg_accuracy, file=open("experimental_output.txt", "a"))
+#         print('avg_depth', file=open("experimental_output.txt", "a"))
+#         print(avg_depth, file=open("experimental_output.txt", "a"))
+#         print('fittest', file=open("experimental_output.txt", "a"))
+#         print(fittest, file=open("experimental_output.txt", "a"))
+#         print(best_features, file=open("experimental_output.txt", "a"))

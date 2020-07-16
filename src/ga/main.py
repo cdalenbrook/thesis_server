@@ -1,31 +1,31 @@
 import pandas as pd
 from feature_selection_ga import FeatureSelectionGA
-from feature_all_possibilities import FeatureSelectionAllPosibilities
+from feature_selection_5_categories import FeatureSelection5Categories
 from preprocessor import ToysPreprocessor, CarsPreprocessor
 from display import display_optimized_pop
+
 
 if __name__ == "__main__":
     for i in range(10):
         # path of dataset to preprocess
-        path = "data/data_categorized_outside.csv"
+        path = "data/car_evaluation.csv"
         df = pd.read_csv(path)
         # select the target variable
-        target = 'outside'
+        target = 'decision'
         # select which data set to preprocess
-        pre = ToysPreprocessor()
+        pre = CarsPreprocessor()
 
-        # select which feature selection (one target variable - FeatureSelectionGA or several - FeatureSelectionAllPosibilities)
         ga = FeatureSelectionGA(
             df,
             target=target,
-            preprocessor=pre,
+            pre=pre,
             crossover_prob=0.6,
             mutation_prob=0.2,
             tournament_size=8,
-            num_gens=1000
+            num_gens=200
         )
 
-        pop, trees, df, fitnesses, accuracies, depths, feature_importances = ga.optimize()
+        pop, trees, df, fitnesses, accuracies, depths, feature_importances, generation_acc, generation_fit = ga.optimize()
 
         accuracy, depth, fitness, best_features = display_optimized_pop(
             df=df,
@@ -37,10 +37,14 @@ if __name__ == "__main__":
             feature_importances=feature_importances,
         )
 
-        # print data to text file
+        # print results to text file
         print('New Run', file=open("experimental_output.txt", "a"))
         print(i, file=open("experimental_output.txt", "a"))
+        print('accuracy', file=open("experimental_output.txt", "a"))
         print(accuracy, file=open("experimental_output.txt", "a"))
+        print('depth', file=open("experimental_output.txt", "a"))
         print(depth, file=open("experimental_output.txt", "a"))
+        print('fitness', file=open("experimental_output.txt", "a"))
         print(fitness, file=open("experimental_output.txt", "a"))
+        print('best_features', file=open("experimental_output.txt", "a"))
         print(best_features, file=open("experimental_output.txt", "a"))
