@@ -1,0 +1,90 @@
+New Run
+0
+Acc: 
+0.6666666666666666
+Depth: 
+2
+[0, 1, 0, 1]
+best_features
+['main colour', 'fluffy']
+New Run
+1
+Acc: 
+0.3333333333333333
+Depth: 
+2
+[0, 0, 1, 0]
+best_features
+['size']
+New Run
+2
+Acc: 
+0.6666666666666666
+Depth: 
+2
+[1, 0, 1, 0]
+best_features
+['wheels', 'size']
+New Run
+3
+Acc: 
+0.6666666666666666
+Depth: 
+2
+[0, 1, 0, 1]
+best_features
+['main colour', 'fluffy']
+New Run
+4
+Acc: 
+0.3333333333333333
+Depth: 
+1
+[1, 0, 0, 0]
+best_features
+['wheels']
+New Run
+5
+Acc: 
+0.6666666666666666
+Depth: 
+2
+[0, 0, 1, 0]
+best_features
+['size']
+New Run
+6
+Acc: 
+1.0
+Depth: 
+1
+[1, 0, 0, 0]
+best_features
+['wheels']
+New Run
+7
+Acc: 
+0.6666666666666666
+Depth: 
+2
+[0, 0, 1, 0]
+best_features
+['size']
+New Run
+8
+Acc: 
+0.6666666666666666
+Depth: 
+2
+[0, 0, 1, 0]
+best_features
+['size']
+New Run
+9
+Acc: 
+0.0
+Depth: 
+2
+[1, 0, 1, 1]
+best_features
+['wheels', 'size', 'fluffy']

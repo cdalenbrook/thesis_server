@@ -103,7 +103,7 @@ class FeatureSelectionRandomValues():
         # fitness aims to have high depth, high accuracy and low number of features
         fitnesses = [0] * len(accuracies)
         for i in range(len(accuracies)):
-            if(depths[i] > 3):
+            if(depths[i] > 2):
                 fitnesses[i] = -1 + 4*accuracies[i]
             else:
                 fitnesses[i] = depths[i] + (4*accuracies[i])
@@ -204,43 +204,43 @@ class FeatureSelectionRandomValues():
         return self.pop, self.df, fitnesses, accuracies, depths, gen_fitness
 
 
-# if __name__ == "__main__":
-#     for j in range(10):
-#         df = pd.read_csv('data/car_evaluation.csv')
-#         ga = FeatureSelectionRandomValues(CarsPreprocessor(
-#         ), target='decision', dataframe=df, crossover_prob=0.6, mutation_prob=0.2, tournament_size=8, num_gens=100)
+if __name__ == "__main__":
+    for j in range(10):
+        df = pd.read_csv('data/data_categorized_outside.csv')
+        ga = FeatureSelectionRandomValues(ToysPreprocessor(
+        ), target='outside', dataframe=df, crossover_prob=0.6, mutation_prob=0.2, tournament_size=8, num_gens=100)
 
-#         pop, df, fitnesses, accuracies, depths, gen_fitness = ga.optimize()
+        pop, df, fitnesses, accuracies, depths, gen_fitness = ga.optimize()
 
-#         # plt.plot(gen_fitness)
-#         # plt.show()
+        # plt.plot(gen_fitness)
+        # plt.show()
 
-#         fittest_idx = fitnesses.index(max(fitnesses))
-#         print('Fittest Index: ', fittest_idx)
-#         fittest = pop[fittest_idx]
-#         print('Fittest Individual: ', fittest)
+        fittest_idx = fitnesses.index(max(fitnesses))
+        print('Fittest Index: ', fittest_idx)
+        fittest = pop[fittest_idx]
+        print('Fittest Individual: ', fittest)
 
-#         accuracy = accuracies[fittest_idx]
-#         print('Accuracy: ', accuracy)
+        accuracy = accuracies[fittest_idx]
+        print('Accuracy: ', accuracy)
 
-#         depth = depths[fittest_idx]
-#         print('Depth: ', depth)
+        depth = depths[fittest_idx]
+        print('Depth: ', depth)
 
-#         features = list(df.columns)
-#         features.pop()
-#         best_features = []
-#         for i in range(len(fittest)):
-#             if(fittest[i] == 1):
-#                 best_features.append(features[i])
+        features = list(df.columns)
+        features.pop()
+        best_features = []
+        for i in range(len(fittest)):
+            if(fittest[i] == 1):
+                best_features.append(features[i])
 
-#         print('Most Important Features', best_features)
+        print('Most Important Features', best_features)
 
-#         print('New Run', file=open("experimental_output.txt", "a"))
-#         print(j, file=open("experimental_output.txt", "a"))
-#         print('Acc: ', file=open("experimental_output.txt", "a"))
-#         print(accuracy, file=open("experimental_output.txt", "a"))
-#         print('Depth: ', file=open("experimental_output.txt", "a"))
-#         print(depth, file=open("experimental_output.txt", "a"))
-#         print(fittest, file=open("experimental_output.txt", "a"))
-#         print('best_features', file=open("experimental_output.txt", "a"))
-#         print(best_features, file=open("experimental_output.txt", "a"))
+        print('New Run', file=open("experimental_output.txt", "a"))
+        print(j, file=open("experimental_output.txt", "a"))
+        print('Acc: ', file=open("experimental_output.txt", "a"))
+        print(accuracy, file=open("experimental_output.txt", "a"))
+        print('Depth: ', file=open("experimental_output.txt", "a"))
+        print(depth, file=open("experimental_output.txt", "a"))
+        print(fittest, file=open("experimental_output.txt", "a"))
+        print('best_features', file=open("experimental_output.txt", "a"))
+        print(best_features, file=open("experimental_output.txt", "a"))

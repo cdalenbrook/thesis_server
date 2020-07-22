@@ -117,7 +117,7 @@ class FeatureSelection5Categories():
         # fitness aims to have high depth, high accuracy and low number of features
         fitnesses = [0] * len(accuracies)
         for i in range(len(accuracies)):
-            if(depths[i] > 3):
+            if(depths[i] > 2):
                 fitnesses[i] = -1 + (4*accuracies[i])
             else:
                 fitnesses[i] = depths[i] + (4*accuracies[i])

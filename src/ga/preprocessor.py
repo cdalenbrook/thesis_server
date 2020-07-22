@@ -59,25 +59,3 @@ class ToysPreprocessor(Preprocessor):
         df = df[[c for c in df if c not in [target]]
                 + [c for c in [target] if c in df]]
         return df
-
-
-class ToysPreprocessorRandom(Preprocessor):
-
-    def preprocess(self, df: pd.DataFrame.T, target) -> pd.DataFrame.T:
-        super().preprocess(df, target)
-        # remove ID and name columns
-        df = df.drop(['id', 'toy'], axis=1)
-        for column in df:
-            # one hot encode string values and remove their corresponding columns
-            if df[column].dtype == object:
-                one_hot_enc = pd.get_dummies(df[column])
-                df = pd.concat([df, one_hot_enc], axis=1)
-                df = df.drop([column], axis=1)
-        # make last column contain the class values
-        df = df[[c for c in df if c not in [target]]
-                + [c for c in [target] if c in df]]
-
-        # randomize class values
-        df[target] = np.random.randint(0, 2, df.shape[0])
-
-        return df
