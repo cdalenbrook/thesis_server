@@ -1,0 +1,9 @@
+firebase-admin==4.3.0
+Flask==1.1.2
+Flask-Cors==3.0.8
+matplotlib==3.2.1
+numpy==1.18.3
+pandas==1.0.3
+scikit-learn==0.22.2.post1
+scipy==1.4.1
+sklearn-json==0.1.0

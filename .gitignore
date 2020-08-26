@@ -27,3 +27,4 @@ htmlcov/
 __pycache__
 thesis
 *.png
+key.json

@@ -1,0 +1,55 @@
+{
+  "meta": "decision-tree",
+  "feature_importances_": [
+    0.0,
+    0.6282364421987758,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.3717635578012241
+  ],
+  "max_features_": 10,
+  "n_classes_": 2,
+  "n_features_": 10,
+  "n_outputs_": 1,
+  "tree_": {
+    "max_depth": 2,
+    "node_count": 5,
+    "nodes": [
+      [1, 2, 1, 12.5, 0.9709505944546686, 10, 10.0],
+      [-1, -1, -2, -2.0, 0.0, 5, 5.0],
+      [3, 4, 9, 0.5, 0.7219280948873623, 5, 5.0],
+      [-1, -1, -2, -2.0, 0.0, 4, 4.0],
+      [-1, -1, -2, -2.0, 0.0, 1, 1.0]
+    ],
+    "values": [
+      [[6.0, 4.0]],
+      [[5.0, 0.0]],
+      [[1.0, 4.0]],
+      [[0.0, 4.0]],
+      [[1.0, 0.0]]
+    ],
+    "nodes_dtype": ["<i8", "<i8", "<i8", "<f8", "<f8", "<i8", "<f8"]
+  },
+  "classes_": [0, 1],
+  "params": {
+    "ccp_alpha": 0.0,
+    "class_weight": null,
+    "criterion": "entropy",
+    "max_depth": null,
+    "max_features": null,
+    "max_leaf_nodes": null,
+    "min_impurity_decrease": 0.0,
+    "min_impurity_split": null,
+    "min_samples_leaf": 1,
+    "min_samples_split": 2,
+    "min_weight_fraction_leaf": 0.0,
+    "presort": "deprecated",
+    "random_state": 100,
+    "splitter": "best"
+  }
+}
