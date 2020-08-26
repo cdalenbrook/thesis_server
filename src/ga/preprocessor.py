@@ -2,6 +2,8 @@ import pandas as pd
 from abc import ABC, abstractmethod
 import numpy as np
 
+# Use this preprocessor to do necessary preprocessing for the Car or Toy dataset
+
 
 class Preprocessor(ABC):
 

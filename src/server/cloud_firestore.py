@@ -3,6 +3,8 @@ from typing import List
 
 
 def save_tree(db, session_id: str, tree, categories: List[str], training_data: dict, tree_image: str):
+    """Function that saves the tree trained according to data given by the user to the database"""
+
     sessions_ref = db.collection('sessions')
     print(tree)
     data = {
@@ -15,6 +17,7 @@ def save_tree(db, session_id: str, tree, categories: List[str], training_data: d
 
 
 def get_tree(db, session_id: str):
+    """Function that fetches the tree made by the user from the database"""
     sessions_ref = db.collection('sessions')
     session = sessions_ref.document(session_id).get()
     return session.get('tree')

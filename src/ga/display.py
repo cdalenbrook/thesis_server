@@ -2,6 +2,8 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.tree import plot_tree
 
+# Function to show in terminal the final population that was found by a GA
+
 
 def display_optimized_pop(pop: list, trees: list, df: pd.DataFrame, fitnesses: list, accuracies: list, depths: list, feature_importances: list):
     fittest_idx = fitnesses.index(max(fitnesses))

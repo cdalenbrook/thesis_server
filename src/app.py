@@ -21,10 +21,7 @@ storage_bucket = storage.bucket(cloud_storage.BUCKETNAME)
 # Cannot convert an array value in an array value.
 @app.route('/create-tree', methods=['POST'])
 def createTree():
-    """
-        createTree() : Creates a decision tree based on the data received
-        and dumps the json for the tree in a Firestore document
-    """
+    """Creates a decision tree based on the data received and dumps the json for the tree in a Firestore document"""
     try:
         session_id = request.json['id']
         categories = request.json['category']
@@ -65,10 +62,7 @@ def createTree():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    """
-        predict() : Gets a prediction from a tree fetched from Firestore
-        using the session_id provided in the request
-    """
+    """Gets a prediction from a tree fetched from Firestore using the session_id provided in the request"""
     try:
         session_id = request.json['id']
         toy_id = request.json['toy_id']
@@ -76,21 +70,13 @@ def predict():
         if not session_id or not toy_id:
             return jsonify({"success": False, "message": f'Request malformed. id: {session_id} toy_id: {toy_id}'}), 400
 
-        tree_json = cloud_firestore.get_tree(db, session_id=session_id)
+        tree_json = cloud_firestore.get_tree(db, session_id=session_id)\
 
         if not tree_json:
             return jsonify({"success": False, "message": f'Tree with id {session_id} does not exist.'}), 400
 
-        print(f'Found tree for session {session_id}')
-
         tree = utilities.json2tree(tree_json)
-
-        print(f'Deserialized the tree for session {session_id}')
-
         prediction = decisiontree.predict(tree, toy_id)
-
-        print(
-            f'Predicting {prediction} for toyID {toy_id} in session {session_id}')
 
         return jsonify({"success": prediction is not None, "prediction": prediction}), 200
 

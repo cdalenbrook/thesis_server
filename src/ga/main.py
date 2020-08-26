@@ -1,3 +1,6 @@
+# Used to run experiments for the feature selection GA that finds
+# the best features for 5 different category values for the toy dataset
+
 import pandas as pd
 from feature_selection_ga import FeatureSelectionGA
 from feature_selection_5_categories import FeatureSelection5Categories

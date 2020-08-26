@@ -4,19 +4,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix
 from sklearn import preprocessing
 import server.utilities
 import os
 
 
 def importData(path):
+    """Imports data from csv pile at given path and returns dataframe"""
     df = pd.read_csv(path)
     df = df.drop('toy', axis=1)
     return df
 
 
 def preprocess(df, target, data):
+    """Performs necessary preprocessing on data"""
     # col name = target, data matches to col
     df[target] = df['id'].map(data)
     cols_at_end = [target]
@@ -28,6 +30,7 @@ def preprocess(df, target, data):
 
 
 def split(df):
+    """Splits data into train and test sets"""
     X = df.iloc[:, :-1]
     y = df.iloc[:, -1]
     X_train, X_test, y_train, y_test = train_test_split(
@@ -36,13 +39,15 @@ def split(df):
 
 
 def train(X_train, y_train):
+    """Trains the Decision Tree Classifier on the data"""
     clf = DecisionTreeClassifier(criterion="entropy", random_state=100)
     clf = clf.fit(X_train, y_train)
     return clf
 
 
 def predict(tree, toy_id):
-    path = server.utilities.get_data_path()
+    """Predict the category value of a new, unseen toy"""
+    path = server.utilities.get_test_data_path()
     df = importData(path)
     X_test = df.loc[df['id'] == toy_id]
     X_test = X_test.drop('id', axis=1)
@@ -50,13 +55,11 @@ def predict(tree, toy_id):
     y_pred = tree.predict(X_test)
     return y_pred.tolist()
 
-
-def accuracy(y_pred, y_test):
-    print("Confusion Matrix: \n", confusion_matrix(y_test, y_pred))
-    return "Accuracy : %d" % (accuracy_score(y_test, y_pred)*100)
+# create a tree from the data
 
 
 def create_tree(categories, data):
+    """Create a decision tree that splits the given data between the given categories"""
     target = categories[0]
     # import the data without classification
     path = server.utilities.get_data_path()
@@ -71,6 +74,7 @@ def create_tree(categories, data):
 
 
 def tree2image(tree, categories):
+    """Generate an image of the generated tree"""
     clf = tree
     fn = ["wheels", "size", "fluffy", "blue",
           "brown", "green", "multi", "pink", "red", "white"]
